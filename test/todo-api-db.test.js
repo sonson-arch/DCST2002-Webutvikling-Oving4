@@ -8,24 +8,24 @@ axios.defaults.baseURL = "http://localhost:3000";
 const testData = [
     { id: 1, title: "Les leksjon", done: 1 },
     { id: 2, title: "Møt opp på forelesning", done: 0 },
-    { id: 3, title: "Gjør øving", done: 0 } 
+    { id: 3, title: "Gjør øving", done: 0 }
 ];
 
 let webServer;
 beforeAll(() => webServer = todoApi.listen(3000));
 
 beforeEach(async () => {
-   const deleteActions = testData.map(task => taskService.delete(task.id));
-   await Promise.all(deleteActions);
+    const deleteActions = testData.map(task => taskService.delete(task.id));
+    await Promise.all(deleteActions);
 
-   const createActions = testData.map(task => taskService.create(task));
-   await Promise.all(createActions);
+    const createActions = testData.map(task => taskService.create(task));
+    await Promise.all(createActions);
 });
 
 afterAll(async () => {
     const deleteActions = [1, 2, 3, 4].map(id => taskService.delete(id));
     await Promise.all(deleteActions);
-    
+
     pool.end();
     webServer.close();
 });
