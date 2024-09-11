@@ -3,6 +3,8 @@ import pool from "../mysql-pool";
 import todoApi from "../todo-api";
 import taskService from "../task-service";
 
+
+//npx jest --testPathPattern=test/todo-api-db.test.js
 axios.defaults.baseURL = "http://localhost:3000";
 
 const testData = [
@@ -26,7 +28,7 @@ afterAll(async () => {
     const deleteActions = [1, 2, 3, 4].map(id => taskService.delete(id));
     await Promise.all(deleteActions);
 
-    pool.end();
+    await pool.end();
     webServer.close();
 });
 
@@ -46,16 +48,26 @@ describe("Fetch tasks (GET)", () => {
         expect(response.data).toEqual(expected);
     });
 
-    test.skip("Fetch all tasks (500 Internal Server Error)", async () => {
-        //todo
+    test("Fetch all tasks (500 Internal Server Error)", async () => {
+        const response = await axios.get("/api/v1/tasks");
+        
+        expect(response.status).toEqual(500);
+        expect(response.data).toEqual("Internal Server Error");
+
     });
 
-    test.skip("Fetch task (404 Not Found)", async () => {
-        //todo
+    test("Fetch task (404 Not Found)", async () => {
+        const response = await axios.get("/api/v1/tasks/4");
+
+        expect(response.status).toEqual(404);
+        expect(response.data).toEqual("Not Found");
     });
 
-    test.skip("Fetch task (500 Internal Server error)", async () => {
-        //todo
+    test("Fetch task (500 Internal Server error)", async () => {
+        const response = await axios.get("/api/v1/tasks/1");
+
+        expect(response.status).toEqual(500);
+        expect(response.data).toEqual("Internal Server Error");
     });
 });
 
@@ -67,12 +79,18 @@ describe("Create new task (POST)", () => {
         expect(response.headers.location).toEqual("tasks/4");
     });
 
-    test.skip("Create new task (400 Bad Request)", async () => {
-        //todo
+    test("Create new task (400 Bad Request)", async () => {
+        const newTask = { id: 4, title: "Ny oppgave" };
+        const response = await axios.post("/api/v1/tasks", newTask);
+        expect(response.status).toEqual(400);
+        expect(response.data).toEqual("Bad Request");
     });
 
-    test.skip("Create new task (500 Internal Server error)", async () => {
-        //todo
+    test("Create new task (500 Internal Server error)", async () => {
+        const newTask = { id: 4, title: "Ny oppgave", done: false };
+        const response = await axios.post("/api/v1/tasks", newTask);
+        expect(response.status).toEqual(500);
+        expect(response.data).toEqual("Internal Server Error");
     });
 });
 
